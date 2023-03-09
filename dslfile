@@ -1,0 +1,64 @@
+workspace {
+
+    model {
+        
+        softwareSystem = softwareSystem "MDM" {
+            SQLDatabase = container "Azure SQL"
+            api = container "Azure APIM" 
+            eventManagement = container "Azure Event Hub"
+            cip = container "Azure AD"
+            ccip = container "Azure AD B2C"
+            blob = container "Azure Container Account (blob)"
+            mainApp = container "Azure Kubernetes Service" {
+            
+                pod1 = component "EventHubParser"
+                pod2 = component "EventProcessor"
+                pod3 = component "WindowsOSChef"
+                pod4 = component "MacOSChef"
+                pod5 = component "WindowsOSOrchestrator"
+                pod6 = component "MACOSOrchestrator"
+                pod7 = component "blobInteractor"
+                
+                pod8 = component "adminPortal"
+                pod9 = component "adminProcessor"
+                pod10 = component "AzureADInteractor"
+                pod11 = component "CRMInteractor"
+            }
+            api -> pod9 "Uses"
+            pod9 -> SQLDatabase "Populates from"
+            pod1 -> eventManagement "Subsribes & forwards to"
+            pod1 -> pod2 "Interprets from and to"
+            pod2 -> pod3 "Sends Requesr to"
+            pod2 -> pod4 "Sends Requesr to"
+            pod2 -> pod5 "Sends Requesr to"
+            pod2 -> pod6 "Sends Requesr to"
+            pod3 -> eventManagement "Sends command as message"
+            pod4 -> eventManagement "Sends command as message"
+            pod5 -> eventManagement "Sends command as message"
+            pod6 -> eventManagement "Sends command as message"
+            pod8 -> pod9 "translates UI request to API request"
+            pod9 -> pod10 "Sends OAuth request"
+            pod10 -> cip "Auth for admins"
+            pod10 -> ccip "Auth for clients"
+            pod9 -> pod11 "sends customer update"
+            pod9 -> pod2 "sends request"
+            pod7 -> blob "Interfaces"
+         }
+         
+        laptop = person "Laptop"
+        admin = person "Admin"
+        3rdparty = person "3rd-Party App"
+        
+
+        laptop -> eventManagement "Sends state/probes"
+        eventManagement -> laptop "Sends command message"
+        admin -> pod8 "Uses [HTTPS]"
+        3rdparty -> api "Uses [JSON]
+        
+    }
+    
+    views {
+        theme default
+    }
+
+}
